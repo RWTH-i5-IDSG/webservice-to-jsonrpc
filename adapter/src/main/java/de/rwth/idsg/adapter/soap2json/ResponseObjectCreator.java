@@ -35,7 +35,8 @@ public class ResponseObjectCreator {
 	 * @throws IOException 
 	 * @throws JsonProcessingException 
 	 */
-	public byte[] createNormalResponse(Element body, Object idHeader) throws JsonProcessingException, IOException, Exception  {
+	public byte[] createNormalResponse(Element body, Object idHeader) 
+			throws JsonProcessingException, IOException, Exception  {
 
 		// Convert the SOAP body element to JSON
 		JsonNode resultNode = convertToJson(body).get(body.getNodeName());
@@ -61,7 +62,8 @@ public class ResponseObjectCreator {
 	 * @throws Exception 
 	 * @throws IOException 
 	 */
-	public byte[] createNormalResponse(Element header, Element body, Object idHeader) throws IOException, Exception {
+	public byte[] createNormalResponse(Element header, Element body, Object idHeader) 
+			throws IOException, Exception {
 
 		// Convert the SOAP header element to JSON
 		ObjectNode headerNode = convertToJson(header);
@@ -92,7 +94,8 @@ public class ResponseObjectCreator {
 	 * @param idHeader	JSON-RPC id
 	 * @throws JsonProcessingException 
 	 */
-	public byte[] createErrorResponse(int code, String message, String[] data, Object idHeader) throws JsonProcessingException {
+	public byte[] createErrorResponse(int code, String message, String[] data, Object idHeader) 
+			throws JsonProcessingException {
 
 		// Create the error member
 		ObjectNode errorObject = MappingRoute.JSON_MAPPER.createObjectNode();

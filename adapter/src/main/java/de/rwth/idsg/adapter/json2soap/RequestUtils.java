@@ -66,17 +66,11 @@ public class RequestUtils {
 		if ( !inputJson.has("method") || !inputJson.get("method").isTextual() ){
 			ResponseObjectCreator roc = new ResponseObjectCreator();
 			return roc.createErrorResponse(-32600, "Invalid Request", null, inputJson.get("id"));
-		//}else if(){
-			//TODO: Check if method available at WS
-			//Collection<BindingOperationInfo> bois = client.getEndpoint().getEndpointInfo().getBinding().getOperations();
 		}
 		if ( inputJson.has("params") && !inputJson.get("params").isObject() ){
 			ResponseObjectCreator roc = new ResponseObjectCreator();
 			return roc.createErrorResponse(-32600, "Invalid Request", null, inputJson.get("id"));
-		}
-		
-		//TODO: Check if params are correct for method
-		
+		}	
 		return null;
 	}
 	
