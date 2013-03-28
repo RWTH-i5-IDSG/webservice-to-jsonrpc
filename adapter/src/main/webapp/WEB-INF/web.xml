@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<display-name>SOAP/JSON-RPC Adapter</display-name>
+
+	<!-- location of spring xml files -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/camel-config.xml</param-value>
+	</context-param>
+
+	<!-- register Camel as a listener -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- Camel servlet used in the Camel application -->
+	<servlet>
+		<servlet-name>AdapterServlet</servlet-name>
+		<servlet-class>org.apache.camel.component.servlet.CamelHttpTransportServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Camel servlet mapping -->
+	<servlet-mapping>
+		<servlet-name>AdapterServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+<!-- 	<env-entry> -->
+<!-- 		<env-entry-name>wsdlUrl</env-entry-name> -->
+<!-- 		<env-entry-type>java.lang.String</env-entry-type> -->
+<!-- 		<env-entry-value>http://www.webservicex.net/ConvertSpeed.asmx?WSDL</env-entry-value> -->
+<!-- 		<env-entry-value>http://www.thomas-bayer.com/axis2/services/BLZService?wsdl</env-entry-value> -->
+<!-- 	</env-entry> -->
+
+</web-app>

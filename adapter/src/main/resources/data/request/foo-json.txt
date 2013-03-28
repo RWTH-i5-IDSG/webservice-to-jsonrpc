@@ -1,0 +1,27 @@
+{"id":12,
+"jsonrpc":"2.0",
+"method":"ConvertSpeed",
+"params":{
+		"greetings": "Hello World"
+	    "glossary": {
+	        "title": "example glossary",
+			"GlossDiv": {
+	            "number": 123423.989,
+				"GlossList": {
+	                "GlossEntry": {
+	                    "ID": "SGML",
+						"SortAs": "SGML",
+						"GlossTerm": "Standard Generalized Markup Language",
+						"Acronym": "SGML",
+						"Abbrev": "ISO 8879:1986",
+						"GlossDef": {
+	                        "para": "A meta-markup language, used to create markup languages such as DocBook.",
+							"GlossSeeAlso": ["GML", "XML"]
+	                    },
+						"GlossSee": "markup"
+	                }
+	            }
+	        }
+	    }
+	}
+}
