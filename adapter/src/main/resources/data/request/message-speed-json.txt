@@ -1,0 +1,10 @@
+{
+   "jsonrpc":"2.0",
+   "method":"ConvertSpeed",
+   "params":{
+      "speed"	:100,
+      "FromUnit":"milesPerhour",
+      "ToUnit"	:"kilometersPerhour"
+   },
+   "id":1234
+}

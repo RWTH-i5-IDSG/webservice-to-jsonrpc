@@ -1,0 +1,5 @@
+<ConvertSpeed xmlns="http://www.webserviceX.NET/">
+	<speed>1</speed>
+	<FromUnit>milesPerhour</FromUnit>
+	<ToUnit>kilometersPerhour</ToUnit>
+</ConvertSpeed>
