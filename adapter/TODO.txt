@@ -3,12 +3,11 @@
 	*: DONE
 	
 ======
-
+	* Create a HTML page with operation details for each adapter 
 	* Filter json-rpc header so that it is not sent as a header to WS
 	* Build a manager servlet for the adapter
 	* Check if method available at WS
 ------
-	# Create a HTML page with operation details for each adapter 
 	# Check if params are correct for method 
 	(This is not critical because if params are not correct WS will send a Soap Fault anyway. 
 	Then the user can adapt the request.)

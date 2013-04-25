@@ -105,6 +105,10 @@ public class RequestUtils {
 			String headerUnderstand = tempValue.path("@mustUnderstand").textValue();
 			((ObjectNode) tempValue).remove("@mustUnderstand");
 			
+			// Extract the value and delete the node
+			String headerActor = tempValue.path("@actor").textValue();
+			((ObjectNode) tempValue).remove("@actor");
+			
 			//String headerNs = tempValue.path("@xmlns").getTextValue();
 			//((ObjectNode) tempValue).remove("@mxmlns");
 			//QName qname = new QName(headerNs, tempKey);
@@ -124,6 +128,11 @@ public class RequestUtils {
 				newSoapHeader.setMustUnderstand(true);	
 			}else {
 				newSoapHeader.setMustUnderstand(false);
+			}
+			
+			// Set the actor attribute of header
+			if(headerActor != null){
+				newSoapHeader.setActor(headerActor);	
 			}
 
 			// Add the header to output
@@ -174,14 +183,14 @@ public class RequestUtils {
 	 * Converts a JsonNode into Xml element
 	 * 
 	 * @param node	JsonNode to be converted
-	 * @param str	String to be written as the root for Xml
+	 * @param rootName	String to be written as the root for Xml
 	 * 
 	 * @throws XMLStreamException 
 	 * @throws ParserConfigurationException 
 	 * @throws SAXException 
 	 * @throws IOException 
 	 */
-	private Element convertToXml(JsonNode node, String str) 
+	private Element convertToXml(JsonNode node, String rootName) 
 			throws XMLStreamException, IOException, SAXException, ParserConfigurationException {
 		
 		// Prepare the node for input. Then set the input and output.
@@ -194,7 +203,7 @@ public class RequestUtils {
 		factory.setProperty(JsonXMLInputFactory.PROP_MULTIPLE_PI, Boolean.FALSE);
 
 		// Define whether the root element is written or not
-		if (str != null) factory.setProperty(JsonXMLInputFactory.PROP_VIRTUAL_ROOT, str);
+		if (rootName != null) factory.setProperty(JsonXMLInputFactory.PROP_VIRTUAL_ROOT, rootName);
 
 		// Create reader (JSON).
 		XMLEventReader reader = factory.createXMLEventReader(input);

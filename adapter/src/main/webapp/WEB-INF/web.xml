@@ -8,7 +8,7 @@
 	<!-- location of spring xml files -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/camel-config.xml</param-value>
+		<param-value>classpath:camel-config.xml</param-value>
 	</context-param>
 
 	<!-- register Camel as a listener -->
@@ -26,8 +26,12 @@
 	<!-- Camel servlet mapping -->
 	<servlet-mapping>
 		<servlet-name>AdapterServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/request/*</url-pattern>
 	</servlet-mapping>
+	
+	<welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
 <!-- 	<env-entry> -->
 <!-- 		<env-entry-name>wsdlUrl</env-entry-name> -->

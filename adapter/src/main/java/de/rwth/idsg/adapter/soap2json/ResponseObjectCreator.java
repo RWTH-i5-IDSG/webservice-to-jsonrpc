@@ -30,12 +30,12 @@ public class ResponseObjectCreator {
 	 * Writes a JSON-RPC 2.0 response object WITHOUT HEADER when everything goes okay
 	 * 
 	 * @param body			The soap body element
-	 * @param idHeader		JSON-RPC id
+	 * @param idProperty		JSON-RPC id
 	 * @throws Exception 
 	 * @throws IOException 
 	 * @throws JsonProcessingException 
 	 */
-	public byte[] createNormalResponse(Element body, Object idHeader) 
+	public byte[] createNormalResponse(Element body, Object idProperty) 
 			throws JsonProcessingException, IOException, Exception  {
 
 		// Convert the SOAP body element to JSON
@@ -48,7 +48,7 @@ public class ResponseObjectCreator {
 		ObjectNode outputJson = MappingRoute.JSON_MAPPER.createObjectNode();
 		outputJson.put("jsonrpc", "2.0");
 		outputJson.put("result", resultNode);
-		outputJson.put("id", (JsonNode) idHeader);
+		outputJson.put("id", (JsonNode) idProperty);
 
 		return MappingRoute.JSON_MAPPER.writeValueAsBytes(outputJson);
 	}
@@ -58,11 +58,11 @@ public class ResponseObjectCreator {
 	 * 
 	 * @param header		The soap header element
 	 * @param body			The soap body element
-	 * @param idHeader		JSON-RPC id
+	 * @param idProperty		JSON-RPC id
 	 * @throws Exception 
 	 * @throws IOException 
 	 */
-	public byte[] createNormalResponse(Element header, Element body, Object idHeader) 
+	public byte[] createNormalResponse(Element header, Element body, Object idProperty) 
 			throws IOException, Exception {
 
 		// Convert the SOAP header element to JSON
@@ -80,7 +80,7 @@ public class ResponseObjectCreator {
 		ObjectNode outputJson = MappingRoute.JSON_MAPPER.createObjectNode();
 		outputJson.put("jsonrpc", "2.0");
 		outputJson.put("result", resultObject);
-		outputJson.put("id", (JsonNode) idHeader);
+		outputJson.put("id", (JsonNode) idProperty);
 
 		return MappingRoute.JSON_MAPPER.writeValueAsBytes(outputJson);
 	}
@@ -91,10 +91,10 @@ public class ResponseObjectCreator {
 	 * @param code		Error code
 	 * @param message	Error message
 	 * @param data		Details about error (if any) 
-	 * @param idHeader	JSON-RPC id
+	 * @param idProperty	JSON-RPC id
 	 * @throws JsonProcessingException 
 	 */
-	public byte[] createErrorResponse(int code, String message, String[] data, Object idHeader) 
+	public byte[] createErrorResponse(int code, String message, String[] data, Object idProperty) 
 			throws JsonProcessingException {
 
 		// Create the error member
@@ -116,7 +116,7 @@ public class ResponseObjectCreator {
 		ObjectNode outputJson = MappingRoute.JSON_MAPPER.createObjectNode();
 		outputJson.put("jsonrpc", "2.0");
 		outputJson.put("error", errorObject);
-		outputJson.put("id", (JsonNode) idHeader);
+		outputJson.put("id", (JsonNode) idProperty);
 
 		return MappingRoute.JSON_MAPPER.writeValueAsBytes(outputJson);
 	}

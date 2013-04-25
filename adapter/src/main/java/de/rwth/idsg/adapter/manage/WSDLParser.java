@@ -1,5 +1,9 @@
 package de.rwth.idsg.adapter.manage;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,14 +16,33 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.camel.util.CastUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import de.rwth.idsg.adapter.common.MappingRoute;
 
-public class WSDLParser {
+/**
+ * @author sg
+ *
+ */
+public class WSDLParser  {
 
 	final static Logger LOG = LoggerFactory.getLogger(WSDLParser.class);
 
@@ -29,23 +52,34 @@ public class WSDLParser {
 	public String wsNamespace;
 	public String soapPortName;
 
+	/**
+	 * Main method that starts the WSDL parsing process and calls other helper methods.
+	 */
 	public void readWSDL(){
 		try {
-			// Read the WSDL URL from <env-entry>
+			// Read the WSDL URL and docBase from config file
 			InitialContext ctx = new InitialContext();
-			wsdlUrl = (String) ctx.lookup("java:comp/env/wsdlUrl"); 
-			LOG.info("Retrieving WSDL from address: " + wsdlUrl);
+			wsdlUrl = (String) ctx.lookup("java:comp/env/wsdlUrl");
+			LOG.info("WSDL URL: " + wsdlUrl);
+			String dirPath = (String) ctx.lookup("java:comp/env/dirPath");
 			ctx.close();
 
+			// Set up the reader
 			WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
 			reader.setFeature("javax.wsdl.verbose", false);
 			reader.setFeature("javax.wsdl.importDocuments", true);
 
-			// Get the whole WSDL file
-			Definition def = reader.readWSDL(wsdlUrl);
+			// Get WSDL as a document
+			Document wsdlDoc = getWSDLAsDocument();
 
-			// Initialize the variables necessary for Cxf
+			// Convert the WSDL document to a WSDL definition
+			Definition def = reader.readWSDL(null, wsdlDoc);
+
+			// Initialize the necessary variables for Cxf
 			initializeVariables(def);
+
+			// Create a HTML page from the WSDL document
+			convertWSDLtoHTML(dirPath, wsdlDoc);
 
 		} catch (WSDLException e) {
 			e.printStackTrace();
@@ -54,8 +88,47 @@ public class WSDLParser {
 		}
 	}
 
-	public void initializeVariables(Definition def){
+	/**
+	 * Gets the WSDL content from URL and creates a document from it
+	 */
+	private Document getWSDLAsDocument(){
+		LOG.info("Retrieving document from the WSDL URL...");
+		Document doc = null;
+		try{
+			// Get the content from URL
+			InputStream inputStream = new URL(wsdlUrl).openStream();
+			InputSource inputSource = new InputSource(inputStream);
+			inputSource.setSystemId(wsdlUrl);
+			if (inputStream == null) throw new IllegalArgumentException("No content at URL.");
 
+			// Set up the factory
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setNamespaceAware(true);
+			factory.setValidating(false);
+
+			// Read the content into a document
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			doc = builder.parse(inputSource);
+			inputStream.close();
+		
+		} catch (RuntimeException e){
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+	    } catch (IOException e) {
+			e.printStackTrace();
+		}
+		return doc;
+	}
+	
+	/**
+	 * Reads the details from the WSDL definition.
+	 */
+	private void initializeVariables(Definition def){
+		
+		// Read the WSDL namespace 
 		wsNamespace = def.getTargetNamespace();
 		LOG.info("Service namespace: " + wsNamespace);
 
@@ -79,6 +152,41 @@ public class WSDLParser {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Creates a HTML page for clients using XSLT that displays information 
+	 * how to access/use the Web service.
+	 */
+	private void convertWSDLtoHTML(String dirPath, Document wsdlDoc){
+		LOG.info("Creating the HTML page from WSDL...");
+		try {
+			// Read the XSLT file
+			InputStream xsltStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("wsdl-viewer.xsl");			
+			if (xsltStream == null){
+				LOG.info("XSLT file could not be read. Skipping the creation of the HTML page.");
+				return;
+			}
+			Source xsltSource = new StreamSource(xsltStream);
+			xsltSource.setSystemId(wsdlUrl);		
+			
+			// Create a transformer from the XSLT
+			Transformer transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
+			
+			// Do the transformation
+			DOMSource domSource = new DOMSource(wsdlDoc);
+			transformer.transform(domSource, new StreamResult(new File(dirPath, "service-details.html")));
+			xsltStream.close();
+			
+		} catch (TransformerFactoryConfigurationError e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
 		}
 	}
 }

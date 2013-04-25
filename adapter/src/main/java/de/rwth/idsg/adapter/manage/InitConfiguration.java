@@ -20,6 +20,6 @@ public class InitConfiguration {
 	}
 	
 	public static String getServletEndpoint(){
-		return "servlet:///request?servletName=AdapterServlet";
+		return "servlet:///?servletName=AdapterServlet";
 	}
 }

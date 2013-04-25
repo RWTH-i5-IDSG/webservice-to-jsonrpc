@@ -68,10 +68,11 @@ public class AdapterManagerServlet extends ManagerServlet {
 		// Get the request details
 		String command 		= request.getPathInfo();
 		String path 		= request.getParameter("path");
-		String deployPath	= "/adapter-" + request.getParameter("deployPath");
+		String pathTail		= request.getParameter("pathTail");
+		String deployPath	= "/adapter-" + pathTail;
 		String deployWar	= request.getParameter("deployWar");
-		String wsdlUrl		= request.getParameter("wsdlUrl");
-
+		String wsdlUrl		= request.getParameter("wsdlUrl");	
+		
 		ContextName cn = null;
 		if (path != null) {
 			cn = new ContextName(path, request.getParameter("version"));
@@ -81,7 +82,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 		if (deployPath != null) {
 			deployCn = new ContextName(deployPath, request.getParameter("deployVersion")); 
 		}
-
+		
 		String message = "";
 
 		if (command == null || command.length() == 0) {
@@ -98,13 +99,12 @@ public class AdapterManagerServlet extends ManagerServlet {
 			String deployConfig = prepareConfigFile(deployPath, wsdlUrl);
 			message = deployInternal(deployConfig, deployCn, deployWar, smClient);
 		}
-
 		printPage(request, response, message);
 	}
 
     /**
-     * Create a XML config file based on the user input
-     * before deploying an adapter.
+     * Create a temporary XML config file based on the user input. 
+     * While deploying its content will be read and saved in Tomcat's conf directory.
      *
      * @param deployPath Path to deploy an adapter
      * @param wsdlUrl WSDL URL parameter to be passed to the adapter
@@ -120,25 +120,38 @@ public class AdapterManagerServlet extends ManagerServlet {
 			Element rootElement = doc.createElement("Context");
 			rootElement.setAttribute("path", deployPath);
 			doc.appendChild(rootElement);
-
-			Element envElement = doc.createElement("Environment");
-			envElement.setAttribute("name", "wsdlUrl");
-			envElement.setAttribute("type", "java.lang.String");
-			envElement.setAttribute("value", wsdlUrl);
-			rootElement.appendChild(envElement);
+			
+			// Create an Environment element to store WSDL URL
+			Element wsdlElement = doc.createElement("Environment");
+			wsdlElement.setAttribute("name", "wsdlUrl");
+			wsdlElement.setAttribute("type", "java.lang.String");
+			wsdlElement.setAttribute("value", wsdlUrl);
+			rootElement.appendChild(wsdlElement);
+			
+			// Create an Environment element to store the absolute path of the adapter.
+			// This is only used as the path to save the result of WSDL--(XSLT)-->HTML transformation.
+			Element dirElement = doc.createElement("Environment");
+			dirElement.setAttribute("name", "dirPath");
+			dirElement.setAttribute("type", "java.lang.String");
+			dirElement.setAttribute("value", getAppBase().getAbsolutePath() + deployPath);		
+			rootElement.appendChild(dirElement);
 
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"no");
-
-			Random generator = new Random();
-			String randomString = String.valueOf(Math.abs(generator.nextInt()));
+			
+			// Config file will be saved in a temporary directory with a random name 
+			int randomPosNumber = Math.abs(new Random().nextInt());
+			String randomString = String.valueOf(randomPosNumber);
 			File tempdir = new File(System.getProperty("java.io.tmpdir"));
-			File contextFile = new File(tempdir, randomString + ".xml");
+			File configFile = new File(tempdir, randomString + ".xml");
 
+			// Save the document 
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(contextFile);
+			StreamResult result = new StreamResult(configFile);
 			transformer.transform(source, result);
-			output = contextFile.getAbsolutePath();
+			
+			// Get the path to pass to Tomcat while deploying
+			output = configFile.getAbsolutePath();
 
 		} catch (TransformerConfigurationException e) {
 			e.printStackTrace();
@@ -205,11 +218,11 @@ public class AdapterManagerServlet extends ManagerServlet {
 		writer.println("<table class=\"deploy\"><tr>");		
 		writer.println("<td class=\"deployRows\">Context path for the adapter :</td>");
 		writer.println("<td class=\"fixedWidth\">/adapter-</td>");
-		writer.println("<td><input type=\"text\" name=\"deployPath\"></td>");	
+		writer.println("<td><input type=\"text\" name=\"pathTail\"></td>");	
 		writer.println("</tr><tr>");		
 
 		writer.println("<td class=\"deployRows\">WAR file URL of the adapter :</td>");
-		writer.println("<td colspan=\"2\"><input type=\"text\" name=\"deployWar\" value=\"/home/sg/git/rwth-i5/adapter/target/adapter.war\"></td>");				
+		writer.println("<td colspan=\"2\"><input type=\"text\" name=\"deployWar\" value=\"/home/sg/git/webservice-to-jsonrpc/adapter/target/adapter.war\"></td>");				
 		writer.println("</tr><tr>");		
 
 		writer.println("<td class=\"deployRows\">WSDL URL of the SOAP Web Service :</td>");
@@ -395,7 +408,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 	protected String deployInternal(String config, ContextName cn, String war, StringManager smClient) {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(stringWriter);
-		super.deploy(printWriter, config, cn, war, false, smClient);	
+		super.deploy(printWriter, config, cn, war, false, smClient);
 		return stringWriter.toString();
 	}
 }
