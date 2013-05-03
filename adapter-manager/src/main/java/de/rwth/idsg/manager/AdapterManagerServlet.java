@@ -47,7 +47,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, ServletException{
 
-		printPage(request, response, "Everything OK");
+		printPage(response, "Everything OK");
 	}
 	
     /**
@@ -87,6 +87,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 
 		if (command == null || command.length() == 0) {
 			// Do nothing and print the page later anyway
+			message = "Everything OK";
 		} else if (command.equals("/start")) {
 			message = start(cn, smClient);
 		} else if (command.equals("/stop")) {
@@ -99,7 +100,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 			String deployConfig = prepareConfigFile(deployPath, wsdlUrl);
 			message = deployInternal(deployConfig, deployCn, deployWar, smClient);
 		}
-		printPage(request, response, message);
+		printPage(response, message);
 	}
 
     /**
@@ -169,11 +170,10 @@ public class AdapterManagerServlet extends ManagerServlet {
     /**
      * Print an HTML page to display
      * 
-     * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @param message The response message after a command is executed
      */
-	protected void printPage(HttpServletRequest request, HttpServletResponse response, String message) 
+	protected void printPage(HttpServletResponse response, String message) 
 			throws IOException{
 
 		response.setContentType("text/html");

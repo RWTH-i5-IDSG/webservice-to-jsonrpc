@@ -3,6 +3,7 @@
 body {
 	background-color: #F6f4f0;
 	font-size: 12px;
+	font-family:Arial,sans-serif;
 	padding: 0;
 	margin: 0;
 }
@@ -105,12 +106,19 @@ table.deploy {
 
 
 input[type="text"] {
+	font-size: 12px;
+	font-family:Arial,sans-serif;
 	width: 100%;
 	padding-bottom: 2px;
 	padding-top: 2px;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
+}
+
+input[type="submit"] { 
+	font-size: 12px; 
+	font-family:Arial,sans-serif;
 }
 
 form.inline {
