@@ -39,7 +39,10 @@ import org.xml.sax.SAXException;
 import de.rwth.idsg.adapter.common.MappingRoute;
 
 /**
- * @author sg
+ * This class calls methods during initialization of the adapter to
+ * obtain the WSDL interface from the URL, parse it and extract 
+ * required information to specify endpoint details. Additionally, it creates 
+ * a HTML page to help clients create JSON-RPC request messages. 
  *
  */
 public class WSDLParser  {
@@ -79,7 +82,7 @@ public class WSDLParser  {
 			initializeVariables(def);
 
 			// Create a HTML page from the WSDL document
-			convertWSDLtoHTML(dirPath, wsdlDoc);
+			if(dirPath != null) convertWSDLtoHTML(dirPath, wsdlDoc);
 
 		} catch (WSDLException e) {
 			e.printStackTrace();
@@ -89,7 +92,7 @@ public class WSDLParser  {
 	}
 
 	/**
-	 * Gets the WSDL content from URL and creates a document from it
+	 * Gets the WSDL content from URL and creates a document from it.
 	 */
 	private Document getWSDLAsDocument(){
 		LOG.info("Retrieving document from the WSDL URL...");

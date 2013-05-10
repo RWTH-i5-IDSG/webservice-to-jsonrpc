@@ -30,6 +30,11 @@ import org.apache.tomcat.util.res.StringManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
+/**
+ * This class provides a Web interface to manage adapter instances.
+ *
+ */
 public class AdapterManagerServlet extends ManagerServlet {
 
 	private static final long serialVersionUID = 4296334930323641322L;
@@ -168,7 +173,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 	
 	
     /**
-     * Print an HTML page to display
+     * Print an HTML page to display.
      * 
      * @param response The servlet response we are creating
      * @param message The response message after a command is executed
@@ -244,7 +249,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 	
 	
     /**
-     * Print the table for adapter instances
+     * Print the table for adapter instances.
      * 
      * @param writer The writer that generates the HTML page
      */

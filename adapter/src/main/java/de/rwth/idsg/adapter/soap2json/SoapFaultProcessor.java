@@ -6,18 +6,17 @@ import org.apache.cxf.binding.soap.SoapFault;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+/**
+ * This class handles a SOAP fault and sends a JSON-RPC error response to client.
+ * Since the table at http://www.jsonrpc.org/specification#error_object is
+ * not enough for our case, the error code is taken from
+ * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php and
+ * message is extended for an easier distinction from other 
+ * JSON-RPC-specific errors.
+ *  
+ */
 public class SoapFaultProcessor implements Processor {
 
-	/**
-	 * Handles a SOAP fault and sends a JSON-RPC error response to client.
-	 * Since the table at http://www.jsonrpc.org/specification#error_object is
-	 * not enough for our case, the error code is taken from
-	 * http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php and
-	 * message is extended for an easier distinction from other 
-	 * JSON-RPC-specific errors.
-	 * 
-	 * @throws JsonProcessingException 
-	 */
 	@Override
 	public void process(Exchange exchange) throws JsonProcessingException{
 

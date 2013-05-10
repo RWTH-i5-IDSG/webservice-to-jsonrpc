@@ -3,11 +3,17 @@ package de.rwth.idsg.adapter.json2soap;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import de.rwth.idsg.adapter.soap2json.ResponseObjectCreator;
 
+/**
+ * The processor to create a JSON-RPC error message 
+ * when method does not exist at WS.
+ */
 public class BOIExceptionProcessor implements Processor {
 	@Override
-	public void process(Exchange exchange) throws Exception {
+	public void process(Exchange exchange) throws JsonProcessingException {
 		ResponseObjectCreator roc = new ResponseObjectCreator();
 		byte[] error = roc.createErrorResponse(
 				-32601, 

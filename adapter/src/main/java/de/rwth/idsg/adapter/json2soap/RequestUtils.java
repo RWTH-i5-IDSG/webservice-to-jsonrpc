@@ -19,11 +19,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.cxf.binding.soap.SoapHeader;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -32,6 +30,11 @@ import de.odysseus.staxon.json.stream.jackson.JacksonStreamFactory;
 import de.rwth.idsg.adapter.common.MappingRoute;
 import de.rwth.idsg.adapter.soap2json.ResponseObjectCreator;
 
+/**
+ * This class is responsible of syntactically converting
+ * JSON-RPC request messages into SOAP request messages.
+ * 
+ */
 public class RequestUtils {
 	
 	DocumentBuilderFactory factory;
@@ -47,14 +50,18 @@ public class RequestUtils {
 		}
 	}
 	
+	
 	/**
 	 * Checks the incoming request for syntax errors according to JSON-RPC 2.0 Specification.
 	 * If an error is found, a JSON-RPC error response is created.
 	 * 
-	 * @throws JsonProcessingException 
+	 * @param inputJson	incoming JSON-RPC request
+	 * 
+	 * @throws IOException 
+	 * 
 	 */
-	public byte[] validateRequest(JsonNode inputJson) throws JsonProcessingException{	
-			
+	public byte[] validateRequest(JsonNode inputJson) throws IOException {
+		
 		if(!inputJson.isObject()){
 			ResponseObjectCreator roc = new ResponseObjectCreator();
 			return roc.createErrorResponse(-32700, "Parse error", null, inputJson.get("id"));
@@ -80,15 +87,14 @@ public class RequestUtils {
 	 * 
 	 * !Namespace/prefix for each element must be provided by client!
 	 * 
-	 * @throws ParserConfigurationException 
+	 * @param input	the "SOAP-HEADER" member under the params member
+	 * 
 	 * @throws XMLStreamException 
-	 * @throws Exception 
 	 * @throws IOException 
 	 * @throws SAXException 
-	 * @throws JsonProcessingException 
 	 */
 	public List<SoapHeader> processHeader(JsonNode input) 
-			throws XMLStreamException, IOException, SAXException, ParserConfigurationException {
+			throws XMLStreamException, SAXException, IOException {
 		
 		// Create a list for output headers
 		List<SoapHeader> output = new ArrayList<SoapHeader>();
@@ -147,14 +153,15 @@ public class RequestUtils {
 	 * 
 	 * Reminder: According to JSON-RPC 2.0 Specification params node MAY be omitted.
 	 * 
-	 * @throws ParserConfigurationException 
-	 * @throws DOMException 
-	 * @throws SAXException 
-	 * @throws IOException 
+	 * @param params	params member of the JSON-RPC request
+	 * @param method	The method that the JSON-RPC request calls
+	 * 
 	 * @throws XMLStreamException 
+	 * @throws IOException 
+	 * @throws SAXException 
 	 */
 	public List<Element> processBody(JsonNode params, String method) 
-			throws DOMException, ParserConfigurationException, XMLStreamException, IOException, SAXException {
+			throws XMLStreamException, SAXException, IOException {
 
 		Element body = null;
 		if ( params == null ){
@@ -171,7 +178,9 @@ public class RequestUtils {
 	
 	/**
 	 *  If client did not provide a namespace for the element, 
-	 *  set to default namespace of Web Service
+	 *  set to default namespace of Web Service.
+	 *  
+	 *  @param element An XML element
 	 */
 	private void setDefaultNamespace(Element element){
 		if ( element.getNamespaceURI() == null ) {
@@ -180,25 +189,25 @@ public class RequestUtils {
 	}
 	
 	/**
-	 * Converts a JsonNode into Xml element
+	 * Converts a JsonNode into Xml element.
 	 * 
 	 * @param node	JsonNode to be converted
 	 * @param rootName	String to be written as the root for Xml
 	 * 
 	 * @throws XMLStreamException 
-	 * @throws ParserConfigurationException 
-	 * @throws SAXException 
 	 * @throws IOException 
+	 * @throws SAXException 
+	 * 
 	 */
 	private Element convertToXml(JsonNode node, String rootName) 
-			throws XMLStreamException, IOException, SAXException, ParserConfigurationException {
+			throws XMLStreamException, IOException, SAXException {
 		
 		// Prepare the node for input. Then set the input and output.
 		byte[] nodeBytes = MappingRoute.JSON_MAPPER.writeValueAsBytes(node);		
 		ByteArrayInputStream input = new ByteArrayInputStream(nodeBytes);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-		// Configure the converter
+		// Configure the converter.
 		JsonXMLInputFactory factory = new JsonXMLInputFactory(new JacksonStreamFactory());
 		factory.setProperty(JsonXMLInputFactory.PROP_MULTIPLE_PI, Boolean.FALSE);
 
@@ -218,6 +227,10 @@ public class RequestUtils {
 		reader.close();
 		writer.close();
 		
-		return builder.parse(new ByteArrayInputStream(output.toByteArray())).getDocumentElement();
+		// Convert output to ByteArrayInputStream.
+		ByteArrayInputStream xmlStream = new ByteArrayInputStream(output.toByteArray());
+		
+		// Convert xmlStream to Document and return its element.	
+		return builder.parse(xmlStream).getDocumentElement();
 	}
 }
