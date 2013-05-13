@@ -43,6 +43,7 @@ public class RequestProcessor implements Processor {
 			inputJson = MappingRoute.JSON_MAPPER.readTree(is);
 		}catch (JsonProcessingException e) {
 			// When parsing fails, send a JSON-RPC error response.
+			// id is null, but still better than returning a generic error.
 			ResponseObjectCreator roc = new ResponseObjectCreator();
 			byte[] error =  roc.createErrorResponse(-32700, "Parse error", null, null);
 			exchange.getIn().setBody(error);
@@ -63,7 +64,10 @@ public class RequestProcessor implements Processor {
 		// Read required JSON members.
 		String inMethodName	= inputJson.get("method").textValue();
 		JsonNode inParamsNode	= inputJson.get("params");
-		JsonNode inHeaderNode	= inParamsNode.get("SOAP-HEADER");	
+		JsonNode inHeaderNode = null;
+		if (inParamsNode != null) {
+			inHeaderNode	= inParamsNode.get("SOAP-HEADER");	
+		}
 
 		// If "SOAP-HEADER" exists, create a Soap header.
 		// Then delete "SOAP-HEADER" from params, so that the body can be created correctly.
