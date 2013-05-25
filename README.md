@@ -13,9 +13,9 @@ The manager is a Web interface similar to the Apache Tomcat’s HTML Manager. Th
 The adapter
 -------
 
-The adapter converts incoming JSON-RPC requests to SOAP requests and invokes the Web service. The SOAP responses from the Web service will be converted to JSON-RPC responses by the adapter and sent back to the client. The adapter generates JSON-RPC responses with the error object if an error occurs. It maps SOAP Faults to JSON-RPC responses with error objects. 
+The adapter converts incoming JSON-RPC requests to SOAP requests and invokes the Web service. The SOAP responses from the Web service will be converted to JSON-RPC responses by the adapter and sent back to the client. The adapter generates JSON-RPC responses with the `error` object if an error occurs. It maps SOAP Faults to JSON-RPC responses with `error` objects. 
 
-Furthermore, the adapter provides a workorund for SOAP Headers since many enterprise Web services often require a Header element in SOAP messages for authentication but JSON-RPC does not specify a similar element. For this purpose, the adapter expects a designated key `“SOAP-HEADER”` under `params` of the JSON-RPC request. The content of a SOAP Header should be stored there. So, the clients should comply with this practice of the adapter and convey JSON-RPC requests of such structure. The remaining contents of params are the method parameters as usual. 
+Furthermore, the adapter provides a workorund for SOAP Headers since many enterprise Web services often require a Header element in SOAP messages for authentication but JSON-RPC does not specify a similar element. For this purpose, the adapter expects a designated key `“SOAP-HEADER”` under `params` of the JSON-RPC request. The content of a SOAP Header should be stored there. So, the clients should comply with this practice of the adapter and convey JSON-RPC requests of such structure. In case the Web service replies with a SOAP Header in the response, the adapter stores its contents under the `“SOAP-HEADER”` of the `result` in the JSON-RPC response. The remaining contents of params are the method parameters as usual. 
 
 The adapter in its current state functions with SOAP 1.1, WSDL 1.1 and JSON-RPC 2.0 protocol versions. An adapter is specific per WSDL and therefore per Web service. After deployment no additional run-time configuration is needed. 
 
