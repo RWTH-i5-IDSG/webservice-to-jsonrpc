@@ -80,6 +80,4 @@ public class ResponseProcessor implements Processor {
 		inputBodyElement = null;
 		inputHeadersList = null;
 	}
-	
-
 }

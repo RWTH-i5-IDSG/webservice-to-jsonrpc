@@ -18,23 +18,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<camel.version>2.10.3</camel.version>
-		<!-- <camel.version>2.11-SNAPSHOT</camel.version> -->
 	</properties>
-
-	<!-- Using the latest version of Camel -->
-	<!-- <repositories> -->
-	<!-- <repository> -->
-	<!-- <id>apache.snapshots</id> -->
-	<!-- <name>Apache Development Snapshot Repository</name> -->
-	<!-- <url>https://repository.apache.org/content/repositories/snapshots/</url> -->
-	<!-- <releases> -->
-	<!-- <enabled>false</enabled> -->
-	<!-- </releases> -->
-	<!-- <snapshots> -->
-	<!-- <enabled>true</enabled> -->
-	<!-- </snapshots> -->
-	<!-- </repository> -->
-	<!-- </repositories> -->
 
 	<dependencies>
 
@@ -60,14 +44,6 @@
 			<artifactId>camel-servlet</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
-
-		<!-- Available with 2.11 version of Camel. Replaces Spring for bootstrapping 
-			Camel -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.camel</groupId> -->
-		<!-- <artifactId>camel-servletlistener</artifactId> -->
-		<!-- <version>${camel.version}</version> -->
-		<!-- </dependency> -->
 
 		<!-- Jackson (JSON-processor) dependencies -->
 		<dependency>
@@ -105,12 +81,12 @@
 			<artifactId>spring-web</artifactId>
 			<version>3.0.7.RELEASE</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>javax.servlet</groupId> -->
+<!-- 			<artifactId>servlet-api</artifactId> -->
+<!-- 			<version>2.5</version> -->
+<!-- 			<scope>provided</scope> -->
+<!-- 		</dependency> -->
 	</dependencies>
 
 	<build>
