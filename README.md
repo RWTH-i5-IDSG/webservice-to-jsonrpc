@@ -1,7 +1,7 @@
 SOAP/JSON-RPC Adapter
 =====================
 
-This tool provides a solution for JSON-RPC clients to use SOAP Web services. The solution is designed as a group of Java servlets to run under Apache Tomcat. It consists of the *emphasis (manager)* servlet and one or more, independent *emphasis (adapter)* servlets.
+This tool provides a solution for JSON-RPC clients to use SOAP Web services. The solution is designed as a group of Java servlets to run under Apache Tomcat. It consists of the *manager* servlet and one or more, independent *adapter* servlets.
 
 
 The manager
