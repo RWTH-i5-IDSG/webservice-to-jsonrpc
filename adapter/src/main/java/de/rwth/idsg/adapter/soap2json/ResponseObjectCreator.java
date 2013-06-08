@@ -3,13 +3,11 @@ package de.rwth.idsg.adapter.soap2json;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
@@ -24,19 +22,29 @@ import de.odysseus.staxon.json.JsonXMLOutputFactory;
 import de.odysseus.staxon.json.stream.jackson.JacksonStreamFactory;
 import de.rwth.idsg.adapter.common.MappingRoute;
 
+
+/**
+ * This class is responsible of syntactically converting
+ * SOAP response messages into JSON-RPC response messages.
+ *
+ */
 public class ResponseObjectCreator {
 	
 	/**
-	 * Writes a JSON-RPC 2.0 response object WITHOUT HEADER when everything goes okay
+	 * Writes a JSON-RPC 2.0 response object WITHOUT HEADER when everything goes okay.
 	 * 
-	 * @param body			The soap body element
+	 * @param body			The SOAP Body element
 	 * @param idProperty		JSON-RPC id
-	 * @throws Exception 
+	 * 
 	 * @throws IOException 
-	 * @throws JsonProcessingException 
+	 * @throws FactoryConfigurationError 
+	 * @throws XMLStreamException 
+	 * @throws JsonMappingException 
+	 * @throws JsonParseException 
+	 * 
 	 */
 	public byte[] createNormalResponse(Element body, Object idProperty) 
-			throws JsonProcessingException, IOException, Exception  {
+			throws JsonParseException, JsonMappingException, XMLStreamException, FactoryConfigurationError, IOException {
 
 		// Convert the SOAP body element to JSON
 		JsonNode resultNode = convertToJson(body).get(body.getNodeName());
@@ -54,16 +62,21 @@ public class ResponseObjectCreator {
 	}
 	
 	/**
-	 * Writes a JSON-RPC 2.0 response object WITH HEADER when everything goes okay
+	 * Writes a JSON-RPC 2.0 response object WITH HEADER when everything goes okay.
 	 * 
-	 * @param header		The soap header element
-	 * @param body			The soap body element
+	 * @param header		The SOAP Header element
+	 * @param body			The SOAP Body element
 	 * @param idProperty		JSON-RPC id
-	 * @throws Exception 
+	 * 
 	 * @throws IOException 
+	 * @throws FactoryConfigurationError 
+	 * @throws XMLStreamException 
+	 * @throws JsonMappingException 
+	 * @throws JsonParseException 
+	 * 
 	 */
 	public byte[] createNormalResponse(Element header, Element body, Object idProperty) 
-			throws IOException, Exception {
+			throws JsonParseException, JsonMappingException, XMLStreamException, FactoryConfigurationError, IOException {
 
 		// Convert the SOAP header element to JSON
 		ObjectNode headerNode = convertToJson(header);
@@ -86,13 +99,15 @@ public class ResponseObjectCreator {
 	}
 
 	/**
-	 * Writes a JSON-RPC 2.0 response object when a RPC call encounters an error
+	 * Writes a JSON-RPC 2.0 response object when a RPC call encounters an error.
 	 * 
 	 * @param code		Error code
 	 * @param message	Error message
 	 * @param data		Details about error (if any) 
 	 * @param idProperty	JSON-RPC id
+	 * 
 	 * @throws JsonProcessingException 
+	 * 
 	 */
 	public byte[] createErrorResponse(int code, String message, String[] data, Object idProperty) 
 			throws JsonProcessingException {
@@ -117,17 +132,15 @@ public class ResponseObjectCreator {
 		outputJson.put("jsonrpc", "2.0");
 		outputJson.put("error", errorObject);
 		outputJson.put("id", (JsonNode) idProperty);
-
+		
 		return MappingRoute.JSON_MAPPER.writeValueAsBytes(outputJson);
 	}
 	
 	/**
-	 * Converts a Xml element into a Json ObjectNode
+	 * Converts a XML element into a JSON ObjectNode.
 	 * 
-	 * @param xml	Xml element to be converted
+	 * @param xml	XML element to be converted
 	 * 
-	 * @throws TransformerException 
-	 * @throws ParserConfigurationException 
 	 * @throws FactoryConfigurationError 
 	 * @throws XMLStreamException 
 	 * @throws IOException 
@@ -135,21 +148,19 @@ public class ResponseObjectCreator {
 	 * @throws JsonParseException 
 	 */
 	private ObjectNode convertToJson(Element xml) 
-			throws ParserConfigurationException, TransformerException, XMLStreamException, 
-			FactoryConfigurationError, JsonParseException, JsonMappingException, IOException {
-		
-		// Set the input and output
+			throws XMLStreamException, FactoryConfigurationError, JsonParseException, JsonMappingException, IOException {
+
+		// Set the input and output.
 		DOMSource input = new DOMSource(xml);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-		// Configure the converter
+		// Configure the converter.
 		JsonXMLOutputFactory factory = new JsonXMLOutputFactory(new JacksonStreamFactory());
 		factory.setProperty(JsonXMLOutputFactory.PROP_NAMESPACE_DECLARATIONS, Boolean.FALSE);
 		factory.setProperty(JsonXMLOutputFactory.PROP_AUTO_ARRAY, Boolean.TRUE);
 		factory.setProperty(JsonXMLOutputFactory.PROP_AUTO_PRIMITIVE, Boolean.TRUE);
-		factory.setProperty(JsonXMLOutputFactory.PROP_VIRTUAL_ROOT, null);
-		factory.setProperty(JsonXMLOutputFactory.PROP_PRETTY_PRINT, Boolean.TRUE);
-		
+		//factory.setProperty(JsonXMLOutputFactory.PROP_VIRTUAL_ROOT, null);
+
 		// Create reader (XML).
 		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(input);
 
@@ -162,7 +173,8 @@ public class ResponseObjectCreator {
 		// Close reader/writer.
 		reader.close();
 		writer.close();
-		
+
+		// Parse output as an ObjectNode and return it.
 		return MappingRoute.JSON_MAPPER.readValue(output.toByteArray(), ObjectNode.class);
 	}
 }

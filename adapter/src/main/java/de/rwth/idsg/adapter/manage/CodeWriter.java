@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import javax.servlet.ServletContext;
 import javax.wsdl.Operation;
 
 public class CodeWriter {

@@ -2,10 +2,14 @@ package de.rwth.idsg.adapter.manage;
 
 
 /**
- * Sets the initial configuration.
+ * This class provides the two endpoint URIs for the Camel route
+ * that is defined in the MappingRoute class.
  */
 public class InitConfiguration {
 	
+	/**
+	 * Creates the endpoint URI for the Web service.
+	 */
 	public static String getServiceEndpoint() {
 		
 		WSDLParser wp = new WSDLParser();
@@ -19,6 +23,10 @@ public class InitConfiguration {
 				+ "&loggingFeatureEnabled=true";		
 	}
 	
+	/**
+	 * Creates the endpoint URI for the Java servlet
+	 * to consume HTTP requests sent by clients.
+	 */
 	public static String getServletEndpoint(){
 		return "servlet:///?servletName=AdapterServlet";
 	}

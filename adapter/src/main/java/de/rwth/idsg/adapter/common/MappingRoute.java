@@ -12,8 +12,7 @@ import de.rwth.idsg.adapter.soap2json.ResponseProcessor;
 import de.rwth.idsg.adapter.soap2json.SoapFaultProcessor;
 
 /**
- * Describes whole mapping route from client to WS and back to client.
- *
+ * This class describes the mapping route from client to WS and back to client.
  */
 public class MappingRoute extends RouteBuilder {
 	
@@ -47,7 +46,6 @@ public class MappingRoute extends RouteBuilder {
 		
 		// Normal route
 		from(InitConfiguration.getServletEndpoint())
-			//.setExchangePattern(ExchangePattern.InOut)
 			.process(new RequestProcessor())
 			.to(InitConfiguration.getServiceEndpoint())
 			.process(new ResponseProcessor())
