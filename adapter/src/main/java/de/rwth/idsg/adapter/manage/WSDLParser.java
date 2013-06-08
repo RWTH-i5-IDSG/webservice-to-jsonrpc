@@ -1,15 +1,11 @@
 package de.rwth.idsg.adapter.manage;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.wsdl.Definition;
@@ -43,23 +39,18 @@ import org.xml.sax.SAXException;
 import com.ibm.wsdl.extensions.schema.SchemaImpl;
 
 import de.rwth.idsg.adapter.common.MappingRoute;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import javax.wsdl.Operation;
 import javax.wsdl.Part;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.commons.schema.XmlSchemaAll;
-import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaChoice;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
-import org.apache.ws.commons.schema.XmlSchemaComplexContent;
-import org.apache.ws.commons.schema.XmlSchemaComplexContentRestriction;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
 import org.apache.ws.commons.schema.XmlSchemaFacet;
-import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
@@ -87,13 +78,13 @@ public class WSDLParser  {
 		//wp.wsdlUrl = "http://www.thomas-bayer.com/axis2/services/BLZService?wsdl";
 		//wp.wsdlUrl = "http://graphical.weather.gov/xml/DWMLgen/wsdl/ndfdXML.wsdl";
 		//wp.wsdlUrl = "http://www.webservicex.net/ConvertSpeed.asmx?WSDL";
-		//wp.wsdlUrl = "http://services.aonaware.com/DictService/DictService.asmx?WSDL";
+		wp.wsdlUrl = "http://services.aonaware.com/DictService/DictService.asmx?WSDL";
 		//wp.wsdlUrl = "http://footballpool.dataaccess.eu/data/info.wso?wsdl";
 		// Malformed & Req. License: wp.wsdlUrl = "http://v1.fraudlabs.com/ip2locationwebservice.asmx?wsdl";
 		// None Existent: wp.wsdlUrl = "http://soap.amazon.com/schemas2/AmazonWebServices.wsdl";
 		//wp.wsdlUrl = "http://developer.ebay.com/webservices/latest/ebaysvc.wsdl";
 		//wp.wsdlUrl = "http://s3.amazonaws.com/ec2-downloads/ec2.wsdl";
-		wp.wsdlUrl = "http://webservices.amazon.com/AWSECommerceService/DE/AWSECommerceService.wsdl";
+		//wp.wsdlUrl = "http://webservices.amazon.com/AWSECommerceService/DE/AWSECommerceService.wsdl"; //Fails to parse Output
 		wp.readWSDL();
 		wp.getOperations();
 	}
@@ -104,12 +95,13 @@ public class WSDLParser  {
 	public void readWSDL(){
 		try {
 			// Read the WSDL URL and docBase from config file
-			//InitialContext ctx = new InitialContext();
-			//wsdlUrl = (String) ctx.lookup("java:comp/env/wsdlUrl");
+			InitialContext ctx = new InitialContext();
+			wsdlUrl = (String) ctx.lookup("java:comp/env/wsdlUrl");
 			
 			LOG.info("WSDL URL: " + wsdlUrl);
-			//String dirPath = (String) ctx.lookup("java:comp/env/dirPath");
-			//ctx.close();
+			String dirPath = (String) ctx.lookup("java:comp/env/dirPath");
+			ctx.getEnvironment();
+			ctx.close();
 
 			// Set up the reader
 			WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
@@ -126,7 +118,7 @@ public class WSDLParser  {
 			initializeVariables(def);
 
 			// Create a HTML page from the WSDL document
-			//convertWSDLtoHTML(dirPath, wsdlDoc);
+			convertWSDLtoHTML(dirPath, wsdlDoc);
 			
 			// Get the XML Schema
 			List<?> extensions = def.getTypes().getExtensibilityElements();
@@ -139,8 +131,8 @@ public class WSDLParser  {
 
 		} catch (WSDLException e) {
 			e.printStackTrace();
-		//} catch (NamingException e) {
-		//	e.printStackTrace();
+		} catch (NamingException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -269,8 +261,6 @@ public class WSDLParser  {
 			for (Part outPart : outParts) {
 				output += getParameterDetails(outPart.getName(), outPart.getElementName(), outPart.getTypeName());	
 			}
-			
-			
 			code.addOperation(operation, params, output);
 		}
 		code.write();
