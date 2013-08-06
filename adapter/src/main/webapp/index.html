@@ -1,66 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head><title>Documentation for SOAP/JSON-RPC Adapter</title></head>
-<style type="text/css">
-
-a:link, .alignLeft a:visited {color: black; text-decoration: underline}
-a:hover, .alignLeft a:active {color: #8F5317; text-decoration: underline}
-
-body {
-	background-color: #F6f4f0;
-	font-size: 12px;
-	font-family:Arial,sans-serif;
-	padding: 0;
-	margin: 0;
-}
-table {
-	width: 60%;
-	border-width: 1px;
-	border-style: solid;
-	border-color: gray;
-	margin-left: auto;
-	margin-right: auto;
-	border-spacing: 0px;
-	color: black;
-	padding: 0px;
-	background-color: #DBD8CC;
-	border-radius: 4px;	
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-}
-table.head {
-	color: white;
-	background-color: #4A4745;
-	text-align: center;
-	padding-bottom: 5px;
-	padding-top: 5px;
-	
-	-webkit-border-bottom-right-radius: 4px;
-	-webkit-border-bottom-left-radius: 4px;
-	-moz-border-radius-bottomright: 4px;
-	-moz-border-radius-bottomleft: 4px;
-	border-bottom-right-radius: 4px;
-	border-bottom-left-radius: 4px;
-
-	-webkit-border-top-right-radius: 0px;
-	-webkit-border-top-left-radius: 0px;
-	-moz-border-radius-topright: 0px;
-	-moz-border-radius-topleft: 0px;
-	border-top-right-radius: 0px;
-	border-top-left-radius: 0px;
-}
-td.content {
-	padding: 15px 15px 15px 15px;
-}
-table th {
-	padding: 6px 10px 6px 10px;
-	font-size: 14px;
-	text-align: left;
-	border-bottom: 1px solid gray;
-	color: white;
-	background-color: #4A4745;
-}
-</style>
+<head>
+	<title>Documentation for SOAP/JSON-RPC Adapter</title>
+	<link type="text/css" rel="stylesheet" href="res/style.css"/>
+</head>
 <body>
 <table class="head">
 	<tr><td>
@@ -73,7 +16,7 @@ table th {
 	<tr><td class="content">
 		This tool enables JSON-RPC clients to use SOAP Web services:<br><br>
 		The client sends regular JSON-RPC requests to the adapter. The adapter will convert these to SOAP requests and invoke the Web service. The SOAP responses from the Web service will be converted to JSON-RPC responses by the adapter and sent back to the client. The adapter in its current state functions with SOAP 1.1 and JSON-RPC 2.0 protocol versions. An adapter is specific per WSDL and therefore per Web service.
-	</tr></td>
+	</td></tr>
 </table>
 <br>	
 <table>
@@ -83,7 +26,19 @@ table th {
 			<li>Clients can send JSON-RPC requests to the adapter at <br><br><big><i>http://yoursite/adaptername<b>/request/</b></i></big></li><br>
 			<li><a href="service-details.html">This page</a> lists all the operations offered by this Web service with their parameters. It should make it easier for clients to create JSON-RPC requests.</li>
 		</ul> 
-	</tr></td>
+	</td></tr>
 </table>
 </body>
+<br>	
+<table>
+	<tr><th>Code Stubs</th></tr>
+	<tr><td class="content">
+		There are code stubs for rapid application development available in the following languages:
+		</td>
+		</tr><tr>
+		<td><ul>
+			<li><a href="ObjC.html">Objective-C</a> - For OS X and iOS.</li>
+		</ul></td> 
+	</tr>
+</table>
 </html> 

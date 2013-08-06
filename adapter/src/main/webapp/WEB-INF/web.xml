@@ -40,4 +40,20 @@
 <!-- 		<env-entry-value>http://www.thomas-bayer.com/axis2/services/BLZService?wsdl</env-entry-value> -->
 <!-- 	</env-entry> -->
 
+
+<!-- <env-entry> -->
+<!-- 	<env-entry-name>wsdlUrl</env-entry-name> -->
+<!-- 	<env-entry-type>java.lang.String</env-entry-type> -->
+<!-- 	<env-entry-value>http://services.aonaware.com/DictService/DictService.asmx?WSDL</env-entry-value> -->
+<!-- </env-entry> -->
+<!-- <env-entry> -->
+<!-- 	<env-entry-name>dirPath</env-entry-name> -->
+<!-- 	<env-entry-type>java.lang.String</env-entry-type> -->
+<!-- 	<env-entry-value>C:\Users\New\Desktop\apache-tomcat-7.0.40\webapps/adapter-test</env-entry-value> -->
+<!-- </env-entry> -->
+
+<!-- 	<env-entry-value>C:\Users\New\git\webservice-to-jsonrpc\adapter\target\adapter</env-entry-value> -->
+
+	
+
 </web-app>

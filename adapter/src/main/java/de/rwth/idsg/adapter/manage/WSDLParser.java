@@ -67,15 +67,15 @@ import org.w3c.dom.Element;
  *
  */
 
-public class WSDLParser  {
+public class WSDLParser {
 
 	final static Logger LOG = LoggerFactory.getLogger(WSDLParser.class);
-	public String wsdlUrl, serviceUrl, serviceName, wsNamespace, soapPortName;
+	public String wsdlUrl, serviceUrl, serviceName, wsNamespace, soapPortName, dirPath;
 	private Port soapPort;
 	private XmlSchema schema;
-	private CodeWriter code;
+	private CodeWriterObjC code;
 
-	
+	/*
 	public static void main(String[] args){
 		WSDLParser wp = new WSDLParser();
 		//wp.wsdlUrl = "http://www.xignite.com/xquotes.asmx?WSDL";
@@ -94,9 +94,9 @@ public class WSDLParser  {
 		//wp.wsdlUrl = "http://developer.ebay.com/webservices/latest/ebaysvc.wsdl";
 		//wp.wsdlUrl = "http://s3.amazonaws.com/ec2-downloads/ec2.wsdl";
 		//wp.wsdlUrl = "http://webservices.amazon.com/AWSECommerceService/DE/AWSECommerceService.wsdl"; //Fails to parse Output
+		// https://www.paypalobjects.com/wsdl/PayPalSvc.wsdl
 		wp.readWSDL();
-		wp.getOperations();
-	}
+	}*/
 	
 	/**
 	 * Main method that starts the WSDL parsing process and calls other helper methods.
@@ -106,10 +106,10 @@ public class WSDLParser  {
 			// Read the WSDL URL and docBase from config file
 			InitialContext ctx = new InitialContext();
 			wsdlUrl = (String) ctx.lookup("java:comp/env/wsdlUrl");
-			
+			//wsdlUrl = "http://services.aonaware.com/DictService/DictService.asmx?WSDL";
 			LOG.info("WSDL URL: " + wsdlUrl);
-			String dirPath = (String) ctx.lookup("java:comp/env/dirPath");
-			ctx.getEnvironment();
+			dirPath = (String) ctx.lookup("java:comp/env/dirPath");
+			//dirPath = "C:\\Users\\New\\Desktop\\output\\";
 			ctx.close();
 
 			// Set up the reader
@@ -127,8 +127,7 @@ public class WSDLParser  {
 			initializeVariables(def);
 
 			// Create a HTML page from the WSDL document
-
-			convertWSDLtoHTML(dirPath, wsdlDoc);
+			if(dirPath != null) convertWSDLtoHTML(wsdlDoc);
 			
 			// Get the XML Schema
 			List<?> extensions = def.getTypes().getExtensibilityElements();
@@ -138,9 +137,9 @@ public class WSDLParser  {
 					schema = new XmlSchemaCollection().read(schElement);			
 				}
 			}
-
-			if(dirPath != null) convertWSDLtoHTML(dirPath, wsdlDoc);
-
+			
+			getOperations();
+			
 		} catch (WSDLException e) {
 			e.printStackTrace();
 		} catch (NamingException e) {
@@ -222,7 +221,7 @@ public class WSDLParser  {
 	 * Creates a HTML page for clients using XSLT that displays information 
 	 * how to access/use the Web service.
 	 */
-	private void convertWSDLtoHTML(String dirPath, Document wsdlDoc){
+	private void convertWSDLtoHTML(Document wsdlDoc){
 		LOG.info("Creating the HTML page from WSDL...");
 		try {
 			// Read the XSLT file
@@ -254,11 +253,13 @@ public class WSDLParser  {
 	}
 	
 	/**
-	 * Gets the operations defined for SOAP Port
+	 * Extracts the operations offered by a webservice from 
+	 * the WSDL definition and calls the routines for code 
+	 * stub creation and respective usage documentation.
 	 */
 	private void getOperations(){
 		
-		code = new CodeWriter(wsdlUrl);
+		code = new CodeWriterObjC(wsdlUrl);
 		LOG.info("**** Listing methods ****");
 
 		for ( Object op : soapPort.getBinding().getPortType().getOperations()) {
@@ -275,7 +276,7 @@ public class WSDLParser  {
 			}
 			code.addOperation(operation, params, output);
 		}
-		code.write();
+		code.write(dirPath);
 	}
 
 	private String getParameterDetails(String name, QName elementName, QName typeName){
@@ -284,8 +285,8 @@ public class WSDLParser  {
 				? schema.getElementByName(elementName).getSchemaType() 
 				: schema.getTypeByName(typeName);
 				
-		if 		(param instanceof XmlSchemaComplexType) return processComplexType( param, name );
-		else if (param instanceof XmlSchemaSimpleType) 	return processSimpleType( (XmlSchemaSimpleType) param, name, isOptional(schema.getElementByName(elementName)) );
+		if 		(param instanceof XmlSchemaComplexType) return processComplexType((XmlSchemaComplexType) param, name );
+		else if (param instanceof XmlSchemaSimpleType) 	return processSimpleType( (XmlSchemaSimpleType)  param, name, isOptional(schema.getElementByName(elementName)) );
         else											return keyVal( name, typeName.getLocalPart(), "");
 	}
 	
@@ -295,14 +296,14 @@ public class WSDLParser  {
 		return "    @\""+ key + "\" : @\"" + value + "\"," + out + "\n";
 	}
 	
-	private String processComplexType( XmlSchemaType elemType, String name) {
-		XmlSchemaParticle particle = ((XmlSchemaComplexType)elemType).getParticle();
+	private String processComplexType( XmlSchemaComplexType elemType, String name) {
+		XmlSchemaParticle particle = elemType.getParticle();
 		String ret = "";
 		
-		if ( particle == null ) { // Some failing advanced object using complex restrictions etc.
+		if ( particle == null ) { // WSDL4J fails parsing some advanced definitions
 			if (elemType.getUnhandledAttributes() != null) {
-				return keyVal( name, "NULL", "Unprocessed complex type - Please refer to documentation");
-			} else {
+				return keyVal( name, "NIL", "Unprocessed complex type - Please refer to documentation");
+			} else { // aka. no such element in the WSDL definition
 				return "";
 			}
 		}
@@ -322,7 +323,7 @@ public class WSDLParser  {
 				} 
 				else if (elementType instanceof XmlSchemaComplexType) {
 					ret += "    @\"" + element.getName() + "\" : @{" + (isOptional(element)?"    // {Optional}\n":"\n") ;
-					ret += processComplexType(elementType, element.getName());
+					ret += processComplexType((XmlSchemaComplexType) elementType, element.getName());
 					ret += "    },\n";
 				} 
 				
