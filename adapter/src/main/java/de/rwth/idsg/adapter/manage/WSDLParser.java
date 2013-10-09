@@ -64,6 +64,9 @@ import org.w3c.dom.Element;
  * obtain the WSDL interface from the URL, parse it and extract 
  * required information to specify endpoint details. Additionally, it creates 
  * a HTML page to help clients create JSON-RPC request messages. 
+ * 
+ * @author Sevket Gökay <sevket.goekay@rwth-aachen.de>
+ * @author Lars C. Gleim <lars.gleim@rwth-aachen.de>
  *
  */
 
@@ -73,7 +76,7 @@ public class WSDLParser {
 	public String wsdlUrl, serviceUrl, serviceName, wsNamespace, soapPortName, dirPath;
 	private Port soapPort;
 	private XmlSchema schema;
-	private CodeWriterObjC code;
+	private CodeWriter code;
 
 	/*
 	public static void main(String[] args){
@@ -253,21 +256,26 @@ public class WSDLParser {
 	}
 	
 	/**
-	 * Extracts the operations offered by a webservice from 
+	 * Extracts the operations offered by a web service from 
 	 * the WSDL definition and calls the routines for code 
 	 * stub creation and respective usage documentation.
 	 */
 	private void getOperations(){
 		
-		code = new CodeWriterObjC(wsdlUrl);
+		code = new CodeWriter(wsdlUrl);
 		LOG.info("**** Listing methods ****");
-
+		
+		// Iterate over all operations defined for a given soap port
 		for ( Object op : soapPort.getBinding().getPortType().getOperations()) {
 			Operation operation = (Operation) op;
 			System.out.println(" - "+operation.getName());
-
+			
+			// Get parts from WSDL that describe the operation's parameters
 			Collection<Part> inParts  = CastUtils.cast(operation.getInput().getMessage().getParts().values());
+			
+			// Get parts from WSDL that describe the operation's return value
 			Collection<Part> outParts = CastUtils.cast(operation.getOutput().getMessage().getParts().values());
+			
 			String params = "", output = "";
 			for (Part inPart : inParts) 
 				params += getParameterDetails(inPart.getName(), inPart.getElementName(), inPart.getTypeName());	
@@ -279,6 +287,13 @@ public class WSDLParser {
 		code.write(dirPath);
 	}
 
+	/**
+	 * Fetches details (names and types) for a given operation parameter or return value
+	 * @param name        A String representing the name of the part within the WSDL
+	 * @param elementName The qualified name of the actual part to identify it uniquely if possible
+	 * @param typeName    The qualified name of the parts type to use it directly if elementName is not set
+	 * @return            A String encoding the parts details
+	 */
 	private String getParameterDetails(String name, QName elementName, QName typeName){
 
 		XmlSchemaType param =  (elementName != null) 
@@ -287,22 +302,31 @@ public class WSDLParser {
 				
 		if 		(param instanceof XmlSchemaComplexType) return processComplexType((XmlSchemaComplexType) param, name );
 		else if (param instanceof XmlSchemaSimpleType) 	return processSimpleType( (XmlSchemaSimpleType)  param, name, isOptional(schema.getElementByName(elementName)) );
-        else											return keyVal( name, typeName.getLocalPart(), "");
+        else											return CodeWriter.keyVal( name, typeName.getLocalPart(), "");
 	}
 	
-	private String keyVal(String key, String value, String comment) {
-		String out = comment.equals("") ? "" : "    // " + comment;
-		//System.out.println(key + ": " + value + out);
-		return "    @\""+ key + "\" : @\"" + value + "\"," + out + "\n";
-	}
+
 	
+	/**
+	 * Processes an XML Schema Complex Type entity. 
+	 * 
+	 * Due to limitations of the WSDL4J project there are various schema extensions that cannot be correctly processed. 
+	 * Therefore a check for such elements is inevitable. In case unhandled attributes are detected, 
+	 * a remark is added to the source code and the function returns.
+	 * If no issues are detected the nested type elements of the complex type are determined and processed analogously 
+	 * to the processing in the getParameterDetails(String name, QName elementName, QName typeName) function. 
+	 * 
+	 * @param elemType The complex entity to parse
+	 * @param name     The name of this entity to use for generation
+	 * @return         A string detailing the type for usage in Objective-C code
+	 */
 	private String processComplexType( XmlSchemaComplexType elemType, String name) {
 		XmlSchemaParticle particle = elemType.getParticle();
 		String ret = "";
 		
 		if ( particle == null ) { // WSDL4J fails parsing some advanced definitions
 			if (elemType.getUnhandledAttributes() != null) {
-				return keyVal( name, "NIL", "Unprocessed complex type - Please refer to documentation");
+				return CodeWriter.keyVal( name, "NIL", "Unprocessed complex type - Please refer to documentation");
 			} else { // aka. no such element in the WSDL definition
 				return "";
 			}
@@ -333,6 +357,14 @@ public class WSDLParser {
 		return ret;
 	}
 
+	/**
+	 * Determines the type name of an XML Schema Simple Type entity
+	 * 
+	 * @param type       The entity to check
+	 * @param name       The name of that entity
+	 * @param isOptional Whether this is defined as optional in the WSDL or not
+	 * @return           The type of the parameter type as a string
+	 */
 	private String processSimpleType(XmlSchemaSimpleType type, String name, boolean isOptional) {
 		String tmp = "";
 		if( isEnumeration(type) ){
@@ -340,7 +372,7 @@ public class WSDLParser {
 		}else{
 			tmp = (type.getName());
 		}
-		return keyVal(name, tmp, (isOptional) ? "{Optional}" : "");
+		return CodeWriter.keyVal(name, tmp, (isOptional) ? "{Optional}" : "");
 	}
 
 	/**
@@ -381,10 +413,19 @@ public class WSDLParser {
 		return values;
 	}
 
+	/**
+	 * Determines if an element is optional
+	 * @param element The element to check
+	 * @return		  True if it is optional, false if not
+	 */
 	private static boolean isOptional(XmlSchemaElement element) {
 		return !(element.getMinOccurs() != 0);
 	}
-
+	
+	/**
+	 * Getter for SOAP port name
+	 * @return The port name
+	 */
 	public String getPortName(){
 		return soapPortName;		
 	}
