@@ -193,7 +193,8 @@ class CodeWriter {
 		
 		//codeUsage += "/* Can Also be Called Neglecting All Responses: \n";
 		//noInputNoOutputWriter(op);
-		codeUsage += " */\n" +
+		//codeUsage += " */\n" +
+		codeUsage += 
 				"callId = [self._soapAdapter "+op.getName()+":completionHandler];\n";
 	}
 	
@@ -238,7 +239,7 @@ class CodeWriter {
 		
 		//codeUsage += "/* Can Also be Called Neglecting All Responses: \n";
 		//hasInputNoOutputWriter(op,"");
-		codeUsage += " */\n";
+		//codeUsage += " */\n";
 		
 		codeUsage += parameterDictionary(op,params) +
 				"callId = [self._soapAdapter "+op.getName()+":"+op.getName()+"Params withHandler:completionHandler];\n";
