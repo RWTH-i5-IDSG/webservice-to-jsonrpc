@@ -227,7 +227,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 		writer.println("</tr><tr>");		
 
 		writer.println("<td class=\"deployRows\">WAR file URL of the adapter :</td>");
-		writer.println("<td colspan=\"2\"><input type=\"text\" name=\"deployWar\" value=\"/home/sg/git/webservice-to-jsonrpc/adapter/target/adapter.war\"></td>");				
+		writer.println("<td colspan=\"2\"><input type=\"text\" name=\"deployWar\" value=\"/path/to/adapter.war\"></td>");				
 		writer.println("</tr><tr>");		
 
 		writer.println("<td class=\"deployRows\">WSDL URL of the SOAP Web Service :</td>");
