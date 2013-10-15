@@ -27,11 +27,21 @@ To successfully deploy the adapter servlet:
 * WSDL <= 1.1 - Currently only XML Schema namespaces are well supported
 * JSON-RPC 2.0
 * Apache Tomcat 7.x or comparable Java Servlet Container
+* Apache Maven
 
 To use the generated Objective-C code stubs and/or stub XCode project:
 * iOS 5.0 or greater
 * XCode 4.4 or greater
 * [Demiurgic JSON-RPC](https://github.com/dbowen/Demiurgic-JSON-RPC) as JSON-RPC Client - bundled with the generated stub XCode project
+
+
+## Building
+
+Build it by running 
+
+	$mvn package
+	
+or simply download the [precompiled binaries](https://raw.github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/master/WS2JSON-v0.1.zip).
 
 
 ## Installation
