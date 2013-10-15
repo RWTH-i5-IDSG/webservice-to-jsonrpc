@@ -41,7 +41,7 @@ Build it by running
 
 	$mvn package
 	
-or simply download the [precompiled binaries](https://raw.github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/master/WS2JSON-v0.1.zip).
+or simply download the [precompiled binaries](https://github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/releases/download/v0.1/WS2JSON-v0.1.zip).
 
 
 ## Installation
