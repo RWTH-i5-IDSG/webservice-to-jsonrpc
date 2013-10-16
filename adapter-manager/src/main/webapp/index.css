@@ -15,6 +15,7 @@ a:link, .alignLeft a:visited {color: black; text-decoration: underline}
 a:hover, .alignLeft a:active {color: #8F5317; text-decoration: underline}
 
 table {
+	min-width: 700px;
 	width: 60%;
 	border-width: 1px;
 	border-style: solid;
@@ -127,7 +128,8 @@ form.inline {
 
 td.deployRows {
 	text-align: right;
-	width: 230px;
+	min-width: 250px;
+	width: 40%;
 	padding-right: 15px;
 }
 

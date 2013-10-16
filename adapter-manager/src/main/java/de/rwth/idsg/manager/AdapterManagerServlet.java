@@ -53,6 +53,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 			throws IOException, ServletException{
 
 		printPage(response, "Everything OK");
+		
 	}
 	
     /**
@@ -73,21 +74,12 @@ public class AdapterManagerServlet extends ManagerServlet {
 		// Get the request details
 		String command 		= request.getPathInfo();
 		String path 		= request.getParameter("path");
-		String pathTail		= request.getParameter("pathTail");
-		String deployPath	= "/adapter-" + pathTail;
-		String deployWar	= request.getParameter("deployWar");
-		String wsdlUrl		= request.getParameter("wsdlUrl");	
 		
 		ContextName cn = null;
 		if (path != null) {
 			cn = new ContextName(path, request.getParameter("version"));
 		}
 
-		ContextName deployCn = null;
-		if (deployPath != null) {
-			deployCn = new ContextName(deployPath, request.getParameter("deployVersion")); 
-		}
-		
 		String message = "";
 
 		if (command == null || command.length() == 0) {
@@ -101,9 +93,20 @@ public class AdapterManagerServlet extends ManagerServlet {
 			message = reload(cn, smClient);
 		} else if (command.equals("/undeploy")) {
 			message = undeploy(cn, smClient);
-		} else if (command.equals("/deploy")) {
-			String deployConfig = prepareConfigFile(deployPath, wsdlUrl);
-			message = deployInternal(deployConfig, deployCn, deployWar, smClient);
+		} else if (command.equals("/deploy")) {			
+			// Get deploy parameters
+			String pathTail		= request.getParameter("pathTail");
+			String deployPath	= "/adapter-" + pathTail;
+			String deployWar	= request.getParameter("deployWar");
+			String wsdlUrl		= request.getParameter("wsdlUrl");
+			
+			if (pathTail.isEmpty() || deployWar.isEmpty() || wsdlUrl.isEmpty()) {
+				message = "FAIL - One or more input fields were empty";
+			} else {
+				ContextName deployCn = new ContextName(deployPath, request.getParameter("deployVersion")); 					
+				String deployConfig = prepareConfigFile(deployPath, wsdlUrl);
+				message = deployInternal(deployConfig, deployCn, deployWar, smClient);
+			}
 		}
 		printPage(response, message);
 	}
@@ -169,8 +172,7 @@ public class AdapterManagerServlet extends ManagerServlet {
 			e.printStackTrace();
 		}
 		return output;
-	}
-	
+	}	
 	
     /**
      * Print an HTML page to display.
@@ -180,151 +182,133 @@ public class AdapterManagerServlet extends ManagerServlet {
      */
 	protected void printPage(HttpServletResponse response, String message) 
 			throws IOException{
+		
+		String page = "<!DOCTYPE html>\n"
+				+ "<html>\n"
+				+ "<head>"
+				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/adapter-manager/index.css\">"
+				+ "<title>/adapter-manager</title>"
+				+ "</head>\n"
+				+ "<body>\n"
+				
+				// The banner table
+				+ "<table class=\"head\"><tr><td>"
+				+ "<a href=\"/adapter-manager/\"><h1>Manager for SOAP/JSON-RPC Adapter</h1></a>"
+				+ "</td></tr></table>"
+				+ "<br>\n"
+				
+				// The message table
+				+ "<table><tr><td class=\"messageTitle\">Message</td><td class=\"message\">" + message + "</td></tr></table>"
+				+ "<br>\n"
+				
+				// The apps table		
+				+ "<table>"
+				+ "<tr><th>Adapter applications</th></tr>\n"
+				+ printAppsTable()
+				+ "</table>\n"
+				+ "<br>\n"
+				
+				// The container table
+				+ "<!-- Deployment table -->\n"
+				+ "<table><tr><th>Deploy a new adapter</th></tr><tr><td>\n"
+				
+				// The deploy table
+				+ "<form method=\"POST\" action=\"/adapter-manager/main/deploy\">\n"
+				+ "<table class=\"deploy\">\n"
+				+ "<tr>"
+				+ "<td class=\"deployRows\">Context path for the adapter :</td>"
+				+ "<td class=\"fixedWidth\">/adapter-</td>"
+				+ "<td><input type=\"text\" name=\"pathTail\"></td></tr>\n"
+				+ "<tr>"
+				+ "<td class=\"deployRows\">WAR file URL of the adapter :</td>"
+				+ "<td colspan=\"2\"><input type=\"text\" name=\"deployWar\" placeholder=\"Path to the template adapter.war\"></td></tr>\n"
+				+ "<tr>"
+				+ "<td class=\"deployRows\">WSDL URL of the SOAP Web Service :</td>"
+				+ "<td colspan=\"2\"><input type=\"text\" name=\"wsdlUrl\"></td></tr>\n"
+				+ "<tr>"
+				+ "<td>&nbsp;</td><td colspan=\"2\"><input type=\"submit\" value=\"Deploy\"></td></tr>\n"
+				+ "</table></form>\n"
+				
+				// Close container table
+				+ "</td></tr></table>\n"
+				// Close HTML
+				+ "</body>\n</html>";	
 
-		response.setContentType("text/html");
-		PrintWriter writer = response.getWriter();
-
-		// Start writing
-		writer.println("<!DOCTYPE html>");
-		writer.println("<html>");
-		writer.println("<head>");
-		writer.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"/adapter-manager/index.css\">");
-		writer.println("<title>/adapter-manager</title>");
-		writer.println("</head>");
-		writer.println("<body>");
-
-		// Write the banner table
-		writer.println("<table class=\"head\"><tr><td>");
-		writer.println("<a href=\"/adapter-manager/\"><h1>Manager for SOAP/JSON-RPC Adapter</h1></a>");
-		writer.println("</td></tr></table>");
-		writer.println("<br>");
-
-		// Write the message table
-		writer.println("<table><tr>");
-		writer.println("<td class=\"messageTitle\">Message</td>");
-		writer.println("<td class=\"message\">" + message + "</td>");
-		writer.println("</tr></table>");
-		writer.println("<br>");
-
-		// Write the apps table		
-		writer.println("<table>");
-		writer.println("<tr><th>Adapter applications</th></tr>");
-		printAppsTable(writer);
-		writer.println("</table>");
-		writer.println("<br>");
-
-		// Write the container table		
-		writer.println("<table>");
-		writer.println("<tr><th>Deploy a new adapter</th></tr>");
-		writer.println("<tr><td>");	
-
-		// Write the deploy table
-		writer.println("<form method=\"POST\" action=\"/adapter-manager/main/deploy\">");
-		writer.println("<table class=\"deploy\"><tr>");		
-		writer.println("<td class=\"deployRows\">Context path for the adapter :</td>");
-		writer.println("<td class=\"fixedWidth\">/adapter-</td>");
-		writer.println("<td><input type=\"text\" name=\"pathTail\"></td>");	
-		writer.println("</tr><tr>");		
-
-		writer.println("<td class=\"deployRows\">WAR file URL of the adapter :</td>");
-		writer.println("<td colspan=\"2\"><input type=\"text\" name=\"deployWar\" value=\"/path/to/adapter.war\"></td>");				
-		writer.println("</tr><tr>");		
-
-		writer.println("<td class=\"deployRows\">WSDL URL of the SOAP Web Service :</td>");
-		writer.println("<td colspan=\"2\"><input type=\"text\" name=\"wsdlUrl\"></td>");
-		writer.println("</tr><tr>");
-
-		writer.println("<td>&nbsp;</td>");
-		writer.println("<td colspan=\"2\"><input type=\"submit\" value=\"Deploy\"></td>");
-		writer.println("</tr></table></form>");
-
-		// Close container table
-		writer.println("</td></tr></table>");
-		// Finish writing
-		writer.println("</body></html>");
-
-		// Finish up the response
-		writer.close();
+        response.setContentType("text/html");
+        PrintWriter writer = response.getWriter();
+        writer.write(page);
+        writer.close();  
 	}
-	
-	
+		
     /**
      * Print the table for adapter instances.
      * 
      * @param writer The writer that generates the HTML page
      */
-	protected void printAppsTable(PrintWriter writer){
+	protected String printAppsTable(){
 
 		// Search for only adapter contexts and save them in a list
 		Container contexts[] = host.findChildren();
 		ArrayList<Context> adapterContexts = new ArrayList<Context>();
-		for (int i = 0; i < contexts.length; i++){
+		for (int i = 0; i < contexts.length; i++) {
 			Context context = (Context) contexts[i];			
 			String path = context.getPath();
-			if( path.startsWith("/adapter-") && !path.equals("/adapter-manager") ){
+			if (path.startsWith("/adapter-") && !path.equals("/adapter-manager")){
 				adapterContexts.add(context);
 			}
 		} 
-
+		
 		// If there is no adapter
-		if( adapterContexts.isEmpty() ){
-			writer.println("<tr><td class=\"noApps\">");
-			writer.println("No adapter application is running!");
-			writer.println("</td></tr>");
-			return;
+		if (adapterContexts.isEmpty()) {
+			return "<tr><td class=\"noApps\">No adapter application is running!</td></tr>\n";
 		}
 
-		///// Start printing the apps table /////
+		///// Start printing the adapter instances /////
 		
-		writer.println("<tr><td>");
-		writer.println("<table class=\"apps\">");
-		writer.println("<tr><th>Path</th><th>WSDL URL</th><th>Running</th><th>Commands</th></tr>");
+		StringBuilder builder = new StringBuilder("<tr><td>\n<table class=\"apps\">"
+				+ "<tr><th>Path</th><th>WSDL URL</th><th>Running</th><th>Commands</th></tr>\n");
 
-		for (Context context : adapterContexts){		
+		for (Context context : adapterContexts) {		
 			String path = context.getPath();
 			String wsdlUrl = context.getNamingResources().findEnvironment("wsdlUrl").getValue();
 			boolean running = context.getState().isAvailable();
 
-			writer.println("<tr>");
-			writer.println("<td class=\"alignLeft\"><a href=\"" + path + "\">" + path + "</a></td>");
-			writer.println("<td><a href=\"" + wsdlUrl + "\">" + wsdlUrl + "</a></td>");
-			writer.println("<td>" + running + "</td>");
-			writer.println("<td class=\"fixedWidth\">");
+			builder.append("<!-- Adapter instance -->\n"
+					+ "<tr>\n"
+					+ "<td class=\"alignLeft\"><a href=\"" + path + "\">" + path + "</a></td>"
+					+ "<td><a href=\"" + wsdlUrl + "\">" + wsdlUrl + "</a></td>"
+					+ "<td>" + running + "</td>\n"
+					+ "<td class=\"fixedWidth\">\n");
 
 			// Write command buttons depending on running state)
-			if (running){				
-				writer.println("<form class=\"inline\">");
-				writer.println("<input type=\"submit\" value=\"Start\" disabled></form>");
-
-				writer.println("<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/stop?path=" + path + "\">");
-				writer.println("<input type=\"submit\" value=\"Stop\"></form>");
-
-				writer.println("<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/reload?path=" + path + "\">");
-				writer.println("<input type=\"submit\" value=\"Reload\"></form>");
-			}else{	
-				writer.println("<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/start?path=" + path + "\">");
-				writer.println("<input type=\"submit\" value=\"Start\"></form>");
-
-				writer.println("<form class=\"inline\">");
-				writer.println("<input class=\"inline\" type=\"submit\" value=\"Stop\" disabled></form>");
-
-				writer.println("<form class=\"inline\">");
-				writer.println("<input class=\"inline\" type=\"submit\" value=\"Reload\" disabled></form>");
+			if (running) {				
+				builder.append("<form class=\"inline\">"
+						+ "<input type=\"submit\" value=\"Start\" disabled></form>\n"
+						+ "<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/stop?path=" + path + "\">"
+						+ "<input type=\"submit\" value=\"Stop\"></form>\n"
+						+ "<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/reload?path=" + path + "\">"
+						+ "<input type=\"submit\" value=\"Reload\"></form>\n");
+			} else {	
+				builder.append("<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/start?path=" + path + "\">"
+						+ "<input type=\"submit\" value=\"Start\"></form>\n"
+						+ "<form class=\"inline\">"
+						+ "<input class=\"inline\" type=\"submit\" value=\"Stop\" disabled></form>\n"
+						+ "<form class=\"inline\">"
+						+ "<input class=\"inline\" type=\"submit\" value=\"Reload\" disabled></form>\n");
 			}
 
 			// Write undeploy button always (independent of running state)
-			writer.println("<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/undeploy?path=" + path + "\">");
-			writer.println("<input type=\"submit\" value=\"Undeploy\"></form>");
-
-			writer.println("</td></tr>");
+			builder.append("<form class=\"inline\" method=\"POST\" action=\"/adapter-manager/main/undeploy?path=" + path + "\">"
+					+ "<input type=\"submit\" value=\"Undeploy\"></form>\n"
+					+ "</td>\n</tr>\n");
 		}
 
-		writer.println("</table>");
-		writer.println("</td></tr>");
+		builder.append("</table>\n</td></tr>");
 				
 		// CLEAR VARIABLES
 		contexts = null;
 		adapterContexts = null;
+		return builder.toString();
 	}
 
     /**
