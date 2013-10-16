@@ -96,13 +96,13 @@ public class AdapterManagerServlet extends ManagerServlet {
 		} else if (command.equals("/deploy")) {			
 			// Get deploy parameters
 			String pathTail		= request.getParameter("pathTail");
-			String deployPath	= "/adapter-" + pathTail;
 			String deployWar	= request.getParameter("deployWar");
 			String wsdlUrl		= request.getParameter("wsdlUrl");
 			
 			if (pathTail.isEmpty() || deployWar.isEmpty() || wsdlUrl.isEmpty()) {
 				message = "FAIL - One or more input fields were empty";
 			} else {
+				String deployPath	= "/adapter-" + pathTail;
 				ContextName deployCn = new ContextName(deployPath, request.getParameter("deployVersion")); 					
 				String deployConfig = prepareConfigFile(deployPath, wsdlUrl);
 				message = deployInternal(deployConfig, deployCn, deployWar, smClient);
