@@ -83,6 +83,7 @@ public class RequestProcessor implements Processor {
 		for (Entry<String, String> entry : MappingRoute.OPERATIONS_MAP.entrySet()) {
 			if (entry.getKey().equals(inMethodName)) {
 				reqMsgPayloadName = entry.getValue();
+				break;
 			}
 		}
 		
