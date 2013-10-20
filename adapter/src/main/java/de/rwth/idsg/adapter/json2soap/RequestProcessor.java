@@ -3,6 +3,7 @@ package de.rwth.idsg.adapter.json2soap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -76,9 +77,20 @@ public class RequestProcessor implements Processor {
 			outHeader = reqUtil.processHeader(inHeaderNode);
 			((ObjectNode) inParamsNode).remove("SOAP-HEADER");
 		}
+		
+		// Find the request message payload name for the given method.
+		String reqMsgPayloadName = "";
+		for (Entry<String, String> entry : MappingRoute.OPERATIONS_MAP.entrySet()) {
+			if (entry.getKey().equals(inMethodName)) {
+				reqMsgPayloadName = entry.getValue();
+			}
+		}
+		
+		// If the payload name could not be found in the map, set it to the method name as the last resort.
+		if (reqMsgPayloadName.isEmpty()) reqMsgPayloadName = inMethodName;
 
 		// Create Soap body.
-		List<Element> outBody = reqUtil.processBody(inParamsNode, inMethodName);
+		List<Element> outBody = reqUtil.processBody(inParamsNode, reqMsgPayloadName);
 
 		// Create a CXF payload. Set exchange body to it.
 		CxfPayload<SoapHeader> outputPayload = new CxfPayload<SoapHeader>(outHeader, outBody);

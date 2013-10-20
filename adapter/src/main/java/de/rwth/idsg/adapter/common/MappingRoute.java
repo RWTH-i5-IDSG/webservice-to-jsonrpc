@@ -1,5 +1,7 @@
 package de.rwth.idsg.adapter.common;
 
+import java.util.HashMap;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.cxf.binding.soap.SoapFault;
 
@@ -22,6 +24,11 @@ public class MappingRoute extends RouteBuilder {
 	// ObjectMapper is thread-safe: http://wiki.fasterxml.com/JacksonFAQThreadSafety
 	public static String WS_NAMESPACE;
 	public static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+	
+	// Operation name and request message payload name might be different.
+	// We store a map of operation names and their request message payload names 
+	// for lookup (for document/literal wrapped style).
+	public static HashMap<String, String> OPERATIONS_MAP = new HashMap<String, String>();
 	
 	@Override
 	public void configure() {

@@ -267,8 +267,9 @@ public class WSDLParser {
 		
 		// Iterate over all operations defined for a given soap port
 		for ( Object op : soapPort.getBinding().getPortType().getOperations()) {
-			Operation operation = (Operation) op;
-			System.out.println(" - "+operation.getName());
+			Operation operation = (Operation) op;						
+			String opName = operation.getName();			
+			System.out.println(" - " + opName);
 			
 			// Get parts from WSDL that describe the operation's parameters
 			Collection<Part> inParts  = CastUtils.cast(operation.getInput().getMessage().getParts().values());
@@ -276,12 +277,25 @@ public class WSDLParser {
 			// Get parts from WSDL that describe the operation's return value
 			Collection<Part> outParts = CastUtils.cast(operation.getOutput().getMessage().getParts().values());
 			
+			// Store the operation name and its input message payload name in a map
+			if (inParts.size() == 1) {
+				Part inPart = inParts.iterator().next();
+				
+				if (inPart.getElementName() == null && inPart.getTypeName() != null) {
+					MappingRoute.OPERATIONS_MAP.put(opName, inPart.getName());
+					
+				} else if (inPart.getElementName() != null && inPart.getTypeName() == null) {
+					MappingRoute.OPERATIONS_MAP.put(opName, inPart.getElementName().getLocalPart());					
+				}
+			}
+			
 			String params = "", output = "";
-			for (Part inPart : inParts) 
+			for (Part inPart : inParts) {				
 				params += getParameterDetails(inPart.getName(), inPart.getElementName(), inPart.getTypeName());	
+			}
 			for (Part outPart : outParts) {
 				output += getParameterDetails(outPart.getName(), outPart.getElementName(), outPart.getTypeName());	
-			}
+			}			
 			code.addOperation(operation, params, output);
 		}
 		code.write(dirPath);
