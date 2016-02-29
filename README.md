@@ -48,11 +48,11 @@ or simply download the [precompiled binaries](https://github.com/RWTH-i5-IDSG/we
 
 1. Deploy the Adapter Manager *adapter-manager.war* using Tomcat's Manager App.
 2. Deploy a new Adapter by entering the necessary parameters at */adapter-manager*, e.g.:
-  ![Deployment Parameters](https://raw.github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/master/adapter/doc/resources/deploy.png)
+  ![Deployment Parameters](https://raw.github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/master/website/deploy.png)
  
         NOTE: A Tomcat user with role "admin" is required to access the Adapter Manager!
  
 3. A new entry should appear in the Adapter list:
-	![Deployed](https://raw.github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/master/adapter/doc/resources/deployed.png)
+	![Deployed](https://raw.github.com/RWTH-i5-IDSG/webservice-to-jsonrpc/master/website/deployed.png)
   
   Refer to the Adapter's documentation page at it's context path for further information and the generated code stubs.
