@@ -235,8 +235,6 @@ public class AdapterManagerServlet extends ManagerServlet {
 
     /**
      * Print the table for adapter instances.
-     * 
-     * @param writer The writer that generates the HTML page
      */
     protected String printAppsTable() {
 
