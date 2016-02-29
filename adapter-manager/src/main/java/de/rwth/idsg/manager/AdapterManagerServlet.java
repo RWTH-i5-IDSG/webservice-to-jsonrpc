@@ -66,8 +66,8 @@ public class AdapterManagerServlet extends ManagerServlet {
         StringManager smClient = getStringManager(request);
 
         // Get the request details
-        String command 		= request.getPathInfo();
-        String path 		= request.getParameter("path");
+        String command = request.getPathInfo();
+        String path = request.getParameter("path");
 
         ContextName cn = null;
         if (path != null) {
@@ -89,9 +89,9 @@ public class AdapterManagerServlet extends ManagerServlet {
             message = undeploy(cn, smClient);
         } else if (command.equals("/deploy")) {
             // Get deploy parameters
-            String pathTail		= request.getParameter("pathTail");
-            String deployWar	= request.getParameter("deployWar");
-            String wsdlUrl		= request.getParameter("wsdlUrl");
+            String pathTail = request.getParameter("pathTail");
+            String deployWar = request.getParameter("deployWar");
+            String wsdlUrl = request.getParameter("wsdlUrl");
 
             if (pathTail.isEmpty() || deployWar.isEmpty() || wsdlUrl.isEmpty()) {
                 message = "FAIL - One or more input fields were empty";
@@ -241,10 +241,10 @@ public class AdapterManagerServlet extends ManagerServlet {
         // Search for only adapter contexts and save them in a list
         Container contexts[] = host.findChildren();
         ArrayList<Context> adapterContexts = new ArrayList<Context>();
-        for (int i = 0; i < contexts.length; i++) {
-            Context context = (Context) contexts[i];
+        for (Container context1 : contexts) {
+            Context context = (Context) context1;
             String path = context.getPath();
-            if (path.startsWith("/adapter-") && !path.equals("/adapter-manager")){
+            if (path.startsWith("/adapter-") && !path.equals("/adapter-manager")) {
                 adapterContexts.add(context);
             }
         }
