@@ -18,9 +18,11 @@ public class SoapFaultProcessor implements Processor {
 
         SoapFault fault = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, SoapFault.class);
 
-        String[] data = {fault.getCodeString("", ""),    // faultcode
-                fault.getReason(),                // faultString
-                fault.getRole()};                // faultActor
+        String[] data = {
+                fault.getCodeString("", ""),    // faultcode
+                fault.getReason(),              // faultString
+                fault.getRole()                 // faultActor
+        };
 
         ResponseObjectCreator roc = new ResponseObjectCreator();
 
