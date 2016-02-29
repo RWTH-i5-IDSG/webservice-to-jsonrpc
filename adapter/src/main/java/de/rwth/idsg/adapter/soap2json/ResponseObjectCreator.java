@@ -1,8 +1,6 @@
 package de.rwth.idsg.adapter.soap2json;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.odysseus.staxon.json.JsonXMLOutputFactory;
@@ -30,11 +28,6 @@ public class ResponseObjectCreator {
      *
      * @param body       The SOAP Body element
      * @param idProperty JSON-RPC id
-     * @throws IOException
-     * @throws FactoryConfigurationError
-     * @throws XMLStreamException
-     * @throws JsonMappingException
-     * @throws JsonParseException
      */
     public byte[] createNormalResponse(Element body, Object idProperty)
             throws XMLStreamException, FactoryConfigurationError, IOException {
@@ -62,11 +55,6 @@ public class ResponseObjectCreator {
      * @param header     The SOAP Header element
      * @param body       The SOAP Body element
      * @param idProperty JSON-RPC id
-     * @throws IOException
-     * @throws FactoryConfigurationError
-     * @throws XMLStreamException
-     * @throws JsonMappingException
-     * @throws JsonParseException
      */
     public byte[] createNormalResponse(Element header, Element body, Object idProperty)
             throws XMLStreamException, FactoryConfigurationError, IOException {
@@ -98,7 +86,6 @@ public class ResponseObjectCreator {
      * @param message    Error message
      * @param data       Details about error (if any)
      * @param idProperty JSON-RPC id
-     * @throws JsonProcessingException
      */
     public byte[] createErrorResponse(int code, String message, String[] data, Object idProperty)
             throws JsonProcessingException {
@@ -131,11 +118,6 @@ public class ResponseObjectCreator {
      * Converts a XML element into a JSON ObjectNode.
      *
      * @param xml XML element to be converted
-     * @throws FactoryConfigurationError
-     * @throws XMLStreamException
-     * @throws IOException
-     * @throws JsonMappingException
-     * @throws JsonParseException
      */
     private ObjectNode convertToJson(Element xml)
             throws XMLStreamException, FactoryConfigurationError, IOException {

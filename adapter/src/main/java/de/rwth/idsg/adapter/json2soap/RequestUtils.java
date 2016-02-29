@@ -49,7 +49,6 @@ public class RequestUtils {
      * JSON-RPC error response is created.
      *
      * @param inputJson incoming JSON-RPC request
-     * @throws IOException
      */
     public byte[] validateRequest(JsonNode inputJson) throws IOException {
 
@@ -78,9 +77,6 @@ public class RequestUtils {
      * !Namespace/prefix for each element must be provided by client!
      *
      * @param input the "SOAP-HEADER" member under the params member
-     * @throws XMLStreamException
-     * @throws IOException
-     * @throws SAXException
      */
     public List<SoapHeader> processHeader(JsonNode input) throws XMLStreamException, SAXException, IOException {
 
@@ -143,9 +139,6 @@ public class RequestUtils {
      *
      * @param params params member of the JSON-RPC request
      * @param method The method that the JSON-RPC request calls
-     * @throws XMLStreamException
-     * @throws IOException
-     * @throws SAXException
      */
     public List<Element> processBody(JsonNode params, String method)
             throws XMLStreamException, SAXException, IOException {
@@ -179,9 +172,6 @@ public class RequestUtils {
      *
      * @param node     JsonNode to be converted
      * @param rootName String to be written as the root for Xml
-     * @throws XMLStreamException
-     * @throws IOException
-     * @throws SAXException
      */
     private Element convertToXml(JsonNode node, String rootName) throws XMLStreamException, IOException, SAXException {
 

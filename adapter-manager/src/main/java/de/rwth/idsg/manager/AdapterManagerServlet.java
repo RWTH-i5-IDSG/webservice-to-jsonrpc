@@ -43,9 +43,6 @@ public class AdapterManagerServlet extends ManagerServlet {
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -57,9 +54,6 @@ public class AdapterManagerServlet extends ManagerServlet {
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

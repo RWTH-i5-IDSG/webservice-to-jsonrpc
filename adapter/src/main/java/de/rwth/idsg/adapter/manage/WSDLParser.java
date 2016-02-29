@@ -416,9 +416,6 @@ public class WSDLParser {
 
     /**
      * Retrieve the string values for an enumeration.
-     *
-     * @param type
-     * @return
      */
     private static List<String> enumeratorValues(XmlSchemaSimpleType type) {
         XmlSchemaSimpleTypeRestriction restriction = (XmlSchemaSimpleTypeRestriction) type.getContent();
