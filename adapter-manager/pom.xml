@@ -1,44 +1,46 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.rwth.idsg</groupId>
-	<artifactId>adapter-manager</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
-	
-	<name>Manager for SOAP/JSON-RPC Adapter</name>
-	<description>Manager for SOAP/JSON-RPC Adapter</description>
-	<url>http://www.myorganization.org</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
+    <groupId>de.rwth.idsg</groupId>
+    <artifactId>adapter-manager</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
 
-	<dependencies>
+    <name>Manager for SOAP/JSON-RPC Adapter</name>
+    <description>Manager for SOAP/JSON-RPC Adapter</description>
+    <url>http://www.myorganization.org</url>
 
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-catalina</artifactId>
-			<version>7.0.35</version>
-			<scope>provided</scope>
-		</dependency>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
-	</dependencies>
-	
-	<build>
-		<defaultGoal>package</defaultGoal>
-		<finalName>adapter-manager</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <dependencies>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>7.0.35</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <finalName>adapter-manager</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
